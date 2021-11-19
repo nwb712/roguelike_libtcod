@@ -156,14 +156,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="command.cpp" />
+    <ClCompile Include="constants.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="game_map.cpp" />
     <ClCompile Include="input_handler.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="command.h" />
+    <ClInclude Include="constants.h" />
     <ClInclude Include="entity.h" />
     <ClInclude Include="game_map.h" />
     <ClInclude Include="input_handler.h" />

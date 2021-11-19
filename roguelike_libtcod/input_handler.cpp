@@ -24,7 +24,7 @@ Command* InputHandler::handle_input() {
                 return &move;
                 break;
             case SDL_SCANCODE_KP_4:
-                move = MoveCommand(-1, 1);
+                move = MoveCommand(-1, 0);
                 return &move;
                 break;
             case SDL_SCANCODE_KP_5:

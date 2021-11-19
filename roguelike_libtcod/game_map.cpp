@@ -3,23 +3,22 @@
 #include "game_map.h"
 #include "tile.h"
 
-/*
-* TODO Need to create a list to store the rectangles representing the rooms. Not sure
-*	yet whether I will separate a room into its own type using a struct.
-* TODO: Address the possible overflow in width * height calculations. It seems 
-*	safe to leave in place for now as I don't believe I will ever exceed 
-	2147483647 Tiles on one GameMap
-*/
 
-GameMap::GameMap(int w, int h, TileGraphic wl, TileGraphic flr) {
+
+GameMap::GameMap(int w, int h, TileGraphic wl, TileGraphic flr, BSPParams bsp_params) {
 	width = w;
 	height = h;
+
 	wall_graphic = wl;
 	floor_graphic = flr;
-	tiles = new Tile[width * height];
-	std::cout << sizeof(tiles);
+
+	int arr_size = (int)(width * height);
+	tiles = new Tile[arr_size];
 	bsp = new TCODBsp(0, 0, w, h);
 	randomizer = new TCODRandom;
+
+	bsp_generate(bsp_params.depth, bsp_params.minh, 
+		bsp_params.minv, bsp_params.max_h_ratio, bsp_params.max_v_ratio);
 }
 GameMap::~GameMap() {
 	delete tiles; delete bsp; delete randomizer;
@@ -47,7 +46,8 @@ void GameMap::render_tiles(tcod::Console* c) {
 }
 
 bool GameMap::in_bounds(int x, int y) {
-	return (x + y * width < sizeof(tiles));
+	int pos = int(x + y * width);
+	return (pos < sizeof(tiles));
 }
 
 bool GameMap::is_passable(int x, int y) {
@@ -77,17 +77,44 @@ void GameMap::bsp_generate(int depth, int minh, int minv, float max_h_ratio, flo
 	
 }
 
-void GameMap::generate_room(int x, int y, int w, int h) {
+void GameMap::dig(int x, int y) {
+	Tile* t = GameMap::get_tile(x, y);
+	if (!t->is_transparent()) {
+		t->toggle_transparent();
+	}
+	if (!t->is_passable()) {
+		t->toggle_passable();
+	}
+	t->set_graphic(&wall_graphic);
+}
+
+void GameMap::dig_room(int x, int y, int w, int h) {
 	for (int i = 0; i < w; i++) {
 		for (int j = 0; j < h; j++) {
-			Tile* t = GameMap::get_tile(x + i, y + j);
-			if (!t->is_transparent()) {
-				t->toggle_transparent();
-			}
-			if (!t->is_passable()) {
-				t->toggle_passable();
-			}
-			t->set_graphic(&wall_graphic);
+			dig(x + i, y + j);
+		}
+	}
+}
+
+void GameMap::dig_tunnel(int x1, int y1, int x2, int y2, bool dir) {
+	if (dir) {
+		int x_dif = x2 - x1;
+		for (int i = 0; i != x_dif; i += (x_dif > 0) - (x_dif < 0)) {
+			dig(x1 + i, y1);
+		}
+		int y_dif = x2 - x1;
+		for (int j = 0; j != y_dif; j += (y_dif > 0) - (y_dif < 0)) {
+			dig(x1 + x_dif, y1 + j);
+		}
+	}
+	else {
+		int y_dif = y2 - y1;
+		for (int j = 0; j != y_dif; j += (y_dif > 0) - (y_dif < 0)) {
+			dig(x1, y1 + j);
+		}
+		int x_dif = x2 - x1;
+		for (int i = 0; i != x_dif; i += (x_dif > 0) - (x_dif < 0)) {
+			dig(x1 + i, y1 + y_dif);
 		}
 	}
 }
