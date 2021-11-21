@@ -2,6 +2,7 @@
 #define TILE_H_11_15_21
 
 #include <libtcod.h>
+#include "constants.h"
 
 struct TileGraphic {
 	char c = ' ';
@@ -19,24 +20,27 @@ struct TileData {
 
 class Tile {
 public:
-	Tile() { return; }
+	Tile() { graphic = TileGraphic(); }
 	Tile(TileGraphic g) {graphic = g;}
 	Tile(TileGraphic g, TileData d) { graphic = g; data = d; }
 
 
 	TileGraphic get_graphic() { return graphic; }
-	void set_graphic(TileGraphic* g) { graphic = *g; }
+	void set_graphic(TileGraphic g) { graphic = g; }
 	TileData get_data() { return data; }
 	void set_data(TileData d) { data = d; }
 
 
 	bool is_passable() { return data.passable; };
+	void set_passable(bool pass) { data.passable = pass; }
 	void toggle_passable() { data.passable = !data.passable; };
 
 	bool is_transparent() { return data.transparent; };
+	void set_transparent(bool tran) { data.transparent = tran; }
 	void toggle_transparent() { data.transparent = !data.transparent; };
 
 	bool is_dark() { return data.dark; };
+	void set_dark(bool dark) { data.dark = dark; }
 	void toggle_dark() { data.dark = !data.dark; };
 private:
 	TileGraphic graphic;

@@ -28,9 +28,7 @@ void Entity::wait() {
 }
 
 std::string Entity::getName() { return name; }
-void Entity::setName(std::string n) {
-	name = n;
-}
+void Entity::setName(std::string n) { name = n; }
 
 int Entity::getX() { return xpos; }
 int Entity::getY() { return ypos; }

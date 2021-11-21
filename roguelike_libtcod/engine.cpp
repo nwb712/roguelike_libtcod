@@ -1,0 +1,95 @@
+#include <iostream>
+#include <libtcod.h>
+#include <SDL.h>
+#include "constants.h"
+#include "engine.h"
+#include "entity.h"
+
+Engine::Engine(int argc, char* argv[]) {
+    /* Initialize Console and Context */
+    console = tcod::Console{ DEF_WIDTH, DEF_HEIGHT };  // Main console.
+    context = initialize_context(&console, argc, argv);
+
+    /* Generate Map */
+
+    map.dig_room(1, 1, 10, 10);
+    map.dig_tunnel(20, 20, 5, 5, true);
+
+    /* Place Entities */
+    entities.push_back(player);
+
+    Entity* goblin = new Entity(5, 5, 'G', tcod::ColorRGB(TCOD_green), "Goblin");
+    entities.push_back(goblin);
+}
+
+
+
+void Engine::update() {
+    Command* command = input.handle_input();
+    execute_player_command(command);
+    if (command) {
+        if (command->get_type() == CommandType::quit_command) {
+            quit = true;
+        }
+    }
+}
+
+
+
+void Engine::execute_player_command(Command* command) {
+    if (command) {
+        if (command->get_type() == CommandType::quit_command) {
+            quit = true;
+        }
+        if (command->get_type() == CommandType::move_command) {
+            if (map.is_passable(player->getX() + command->getDx(), player->getY() + command->getDy())) {
+                command->execute(*player);
+            }
+            else {
+                // May be a good idea to create a message class
+                std::cout << "You walk into a wall.\n";
+            }
+        }
+    }
+}
+
+
+
+tcod::ContextPtr Engine::initialize_context(tcod::Console* console, int argc, char* argv[]) {
+    // Configure the context.
+    auto params = TCOD_ContextParams{};
+
+    params.tcod_version = TCOD_COMPILEDVERSION;  // This is required.
+    params.console = console->get();  // Derive the window size from the console size.
+    params.window_title = "The Great Roguelike";
+    params.sdl_window_flags = SDL_WINDOW_RESIZABLE;
+    params.vsync = true;
+    params.argc = argc;  // This allows some user-control of the context.
+    params.argv = argv;
+
+    auto tileset = tcod::load_tilesheet("assets/16x16-sb-ascii.png", { 16, 16 }, tcod::CHARMAP_CP437);
+    params.tileset = tileset.get();
+    return tcod::new_context(params);
+}
+
+
+
+void Engine::render() {
+    TCOD_console_clear(console.get());
+    render_entities();
+    map.render_tiles(&console);
+    context->present(console);  // Updates the visible display.
+}
+
+
+
+/*
+* TODO: Goblin entity not getting inserted to the list properly, bad data cuases exception
+*/
+void Engine::render_entities() {
+    Entity* e;
+    for (int i = 0; i < entities.size(); i++) {
+        e = entities[i];
+        tcod::print(console, { e->getX(), e->getY() }, std::string(1, e->getChar()), e->getColor(), std::nullopt);
+    }
+};

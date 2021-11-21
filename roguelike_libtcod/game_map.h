@@ -40,8 +40,12 @@ struct Room {
 */
 class GameMap {
 public:
+	// The default constructor pulls data from constants.h to initialize vars
+	GameMap();
 	GameMap(int w, int h, TileGraphic wl, TileGraphic flr, BSPParams bsp_params);
 	~GameMap();
+
+	void initialize_tiles(int width, int height, TileGraphic t);
 	Tile* get_tile(int x, int y);
 	void render_tiles(tcod::Console* console);
 
@@ -49,12 +53,15 @@ public:
 	bool in_bounds(int x, int y);
 
 	bool is_passable(int x, int y);
+	void set_passable(int x, int y, bool pass) { get_tile(x, y)->set_passable(pass); }
 	void toggle_passable(int x, int y);
 
 	bool is_transparent(int x, int y);
+	void set_transparent(int x, int y, bool tran) { get_tile(x, y)->set_transparent(tran); }
 	void toggle_transparent(int x, int y);
 
 	bool is_dark(int x, int y);
+	void set_dark(int x, int y, bool dark) { get_tile(x, y)->set_dark(dark); }
 	void toggle_dark(int x, int y);
 
 	/* 
@@ -64,13 +71,22 @@ public:
 	void bsp_generate(int depth, int minh, int minv, float max_h_ratio, float max_v_ratio);
 	
 	/*
-	* Set the state of a tile in a specific location on the map to both 
-	* transparent and passable. Also update the graphic to the floor graphic.
-	*/
+	 * Retrieve a reference to the tile at the specified location, then set the
+	 * following: transparent = true; passable = true; graphic = wall_graphic
+	 */
 	void dig(int x, int y);
-	// Dig out a rectangular area of tiles
+
+	// Execute the dig function at all points within the rect desc by (x, y, w, h)
 	void dig_room(int x, int y, int w, int h);
-	// Dig a tunnel from one point to another; dir = true -> horizontal first
+	
+	/*
+	 * Execute dig() function to dig a tunnell from one point to another; either
+	 * horizontally or vertically first.
+	 * dir = true (default) -> horizontal, then vertical
+	 * dir = false -> vertical, then horizontal
+	 *
+	 * Note that reversing the two points also has the same effect as switching dir.
+	 */
 	void dig_tunnel(int x1, int y1, int x2, int y2, bool dir = true);
 private:
 	int width = 1;
@@ -78,6 +94,7 @@ private:
 	TileGraphic wall_graphic;
 	TileGraphic floor_graphic;
 	Tile *tiles;
+	BSPParams bsp_params;
 	TCODBsp *bsp;
 	TCODRandom* randomizer;
 };

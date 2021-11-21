@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="command.cpp" />
     <ClCompile Include="constants.cpp" />
+    <ClCompile Include="engine.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="game_map.cpp" />
     <ClCompile Include="input_handler.cpp" />
@@ -165,6 +166,7 @@
   <ItemGroup>
     <ClInclude Include="command.h" />
     <ClInclude Include="constants.h" />
+    <ClInclude Include="engine.h" />
     <ClInclude Include="entity.h" />
     <ClInclude Include="game_map.h" />
     <ClInclude Include="input_handler.h" />

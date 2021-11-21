@@ -50,4 +50,5 @@ Command* InputHandler::handle_input() {
             break;
         }
     }
+    return nullptr;
 }
