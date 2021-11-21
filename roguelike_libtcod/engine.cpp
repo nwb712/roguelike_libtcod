@@ -12,10 +12,10 @@ Engine::Engine(int argc, char* argv[]) {
 
     /* Generate Map */
 
-    map.dig_room(1, 1, 10, 10);
-    map.dig_tunnel(20, 20, 5, 5, true);
+
 
     /* Place Entities */
+    player->setPos(map.get_room(0).center_x(), map.get_room(0).center_y());
     entities.push_back(player);
 
     Entity* goblin = new Entity(5, 5, 'G', tcod::ColorRGB(TCOD_green), "Goblin");
@@ -76,8 +76,8 @@ tcod::ContextPtr Engine::initialize_context(tcod::Console* console, int argc, ch
 
 void Engine::render() {
     TCOD_console_clear(console.get());
-    render_entities();
     map.render_tiles(&console);
+    render_entities();
     context->present(console);  // Updates the visible display.
 }
 

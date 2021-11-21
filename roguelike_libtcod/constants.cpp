@@ -6,22 +6,27 @@
 const int DEF_WIDTH = 80;
 const int DEF_HEIGHT = 50;
 
+const int MIN_ROOM_W = 5;
+const int MAX_ROOM_W = 8;
+const int MIN_ROOM_H = 5;
+const int MAX_ROOM_H = 8;
+
 const TileGraphic DEF_WALL_GRAPHIC{
         ' ',
-        tcod::ColorRGB(TCOD_purple),
-        tcod::ColorRGB(TCOD_purple),
-        tcod::ColorRGB(TCOD_red),
-        tcod::ColorRGB(TCOD_red),
+        tcod::ColorRGB(255, 255, 255),
+        tcod::ColorRGB(100, 100, 100),
+        tcod::ColorRGB(125, 125, 125),
+        tcod::ColorRGB(0, 0, 0),
 };
 
 const TileGraphic DEF_FLOOR_GRAPHIC{
     ' ',
-    tcod::ColorRGB(TCOD_black),
-    tcod::ColorRGB(TCOD_light_blue),
-    tcod::ColorRGB(TCOD_blue),
-    tcod::ColorRGB(TCOD_blue),
+    tcod::ColorRGB(100, 100, 100),
+    tcod::ColorRGB(175, 175, 120),
+    tcod::ColorRGB(50, 50, 50),
+    tcod::ColorRGB(85, 85, 60),
 };
 
 const BSPParams DEF_BSP_PARAMS{
-    3 ,4 ,4 ,0.75 ,0.75
+    6 ,7 ,7 ,1.0 ,1.0
 };

@@ -25,13 +25,17 @@ struct BSPParams {
 };
 
 // A rectangle struct to hold room information
-struct Room {
-	Room(int xx, int yy, int ww, int hh): x(xx), y(yy), w(ww), h(hh) {}
+struct Rect {
+	Rect() {}
+	Rect(int xx, int yy, int ww, int hh): x(xx), y(yy), w(ww), h(hh) {}
+	int center_x() { return x + (int)w / 2; }
+	int center_y() { return y + (int)h / 2; }
 	int x = 0;
 	int y = 0;
 	int w = 0;
 	int h = 0;
 };
+
 
 
 /*
@@ -64,12 +68,28 @@ public:
 	void set_dark(int x, int y, bool dark) { get_tile(x, y)->set_dark(dark); }
 	void toggle_dark(int x, int y);
 
+	// Custom callback for TCODBsp
+	class BSPCallBack : public ITCODBspCallback {
+	public:
+		BSPCallBack(GameMap* m) : map(m) {}
+		bool visitNode(TCODBsp* node, void* userData);
+	private:
+		GameMap* map;
+	};
+
 	/* 
 	* Generate the bsp tree using the given parameters. Called during construction
 	* using BSPParams. Specifics of BSP can be found in libtcod documentation.
 	*/
 	void bsp_generate(int depth, int minh, int minv, float max_h_ratio, float max_v_ratio);
 	
+	/*
+	* Generate rooms within each bsp-generated rectangle
+	*/
+	void bsp_generate_rooms(int minw, int minh, int maxw, int maxh);
+
+	Rect get_room(int index);
+
 	/*
 	 * Retrieve a reference to the tile at the specified location, then set the
 	 * following: transparent = true; passable = true; graphic = wall_graphic
@@ -78,6 +98,7 @@ public:
 
 	// Execute the dig function at all points within the rect desc by (x, y, w, h)
 	void dig_room(int x, int y, int w, int h);
+	void dig_room(Rect rm);
 	
 	/*
 	 * Execute dig() function to dig a tunnell from one point to another; either
@@ -94,9 +115,14 @@ private:
 	TileGraphic wall_graphic;
 	TileGraphic floor_graphic;
 	Tile *tiles;
+
 	BSPParams bsp_params;
 	TCODBsp *bsp;
+
 	TCODRandom* randomizer;
+
+	std::vector<Rect> rects;
+	std::vector<Rect> rooms;
 };
 
 #endif

@@ -18,6 +18,7 @@ public:
 
 	int getX();
 	int getY();
+	void setPos(int x, int y) { xpos = x; ypos = y; }
 
 	char getChar();
 	void setChar(char c);
