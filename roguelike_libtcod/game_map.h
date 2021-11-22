@@ -5,15 +5,7 @@
 #include <libtcod.h>
 #include "tile.h"
 
-/*
-* TODO Need to create a list to store the rectangles representing the rooms.
-* TODO Finish implementing BSP generation. Room and tunnel digging are functional,
-*	so the only thing left to do is get the tcod bsp functionality working and 
-*	somehow export that information to a list of rooms. For now, rooms will simply
-*	hollow out the whole bsp rect, but would like to allow for a size range and 
-*	random placement within the bsp node. I got it working in GDScript, so 
-*	reference the Godot project if there are difficulties.
-*/
+
 
 // Holds all of the parameters needed to initialize the GameMap
 struct BSPParams {
@@ -52,6 +44,19 @@ public:
 	void initialize_tiles(int width, int height, TileGraphic t);
 	Tile* get_tile(int x, int y);
 	void render_tiles(tcod::Console* console);
+
+	/* 
+	* intitialize the fov_map to the proper dimensions then read in walkable and
+	* transparency data so that fov can be properly computed. FOV functions now 
+	* are essentially just a wrapper around the TCODMap functionality. Considering 
+	* separating fov into its own class at some point, but it works just fine 
+	* within GameMap for right now. 
+	*/
+	void initialize_fov_map();
+	// Compute the fov at a given x, y location (usually the player position)
+	void compute_fov(int x, int y, int radius = 6, bool light_walls = true, TCOD_fov_algorithm_t algo = FOV_BASIC);
+	// Return whether a cell at a given x, y location is within fov
+	bool is_in_fov(int x, int y) { return fov_map->isInFov(x, y); }
 
 	// Returns true if the given coordinate is within the bounds of the tile map
 	bool in_bounds(int x, int y);
@@ -115,6 +120,8 @@ private:
 	TileGraphic wall_graphic;
 	TileGraphic floor_graphic;
 	Tile *tiles;
+
+	TCODMap* fov_map;
 
 	BSPParams bsp_params;
 	TCODBsp *bsp;

@@ -18,8 +18,15 @@ Engine::Engine(int argc, char* argv[]) {
     player->setPos(map.get_room(0).center_x(), map.get_room(0).center_y());
     entities.push_back(player);
 
-    Entity* goblin = new Entity(5, 5, 'G', tcod::ColorRGB(TCOD_green), "Goblin");
+    Entity* goblin = new Entity(map.get_room(1).center_x(), 
+        map.get_room(1).center_y(), 'G', tcod::ColorRGB(TCOD_green), "Goblin");
     entities.push_back(goblin);
+}
+
+
+
+Engine::~Engine() {
+    delete_entities();
 }
 
 
@@ -42,6 +49,7 @@ void Engine::execute_player_command(Command* command) {
             quit = true;
         }
         if (command->get_type() == CommandType::move_command) {
+            recompute_fov = true; // Need to recompute map fov after player move
             if (map.is_passable(player->getX() + command->getDx(), player->getY() + command->getDy())) {
                 command->execute(*player);
             }
@@ -76,6 +84,10 @@ tcod::ContextPtr Engine::initialize_context(tcod::Console* console, int argc, ch
 
 void Engine::render() {
     TCOD_console_clear(console.get());
+    if (recompute_fov) {
+        map.compute_fov(player->getX(), player->getY());
+        recompute_fov = false;
+    }
     map.render_tiles(&console);
     render_entities();
     context->present(console);  // Updates the visible display.
@@ -83,13 +95,22 @@ void Engine::render() {
 
 
 
-/*
-* TODO: Goblin entity not getting inserted to the list properly, bad data cuases exception
-*/
 void Engine::render_entities() {
     Entity* e;
     for (int i = 0; i < entities.size(); i++) {
         e = entities[i];
-        tcod::print(console, { e->getX(), e->getY() }, std::string(1, e->getChar()), e->getColor(), std::nullopt);
+        if (map.is_in_fov(e->getX(), e->getY())){
+            tcod::print(console, { e->getX(), e->getY() }, 
+                std::string(1, e->getChar()), e->getColor(), std::nullopt);
+        }
     }
 };
+
+
+
+void Engine::delete_entities() {
+    for (int i = 0; i < entities.size(); i++) {
+        delete entities[i];
+    }
+    entities.clear();
+}

@@ -16,8 +16,10 @@
 class Engine {
 public:
 	bool quit = false;
+	bool recompute_fov = true;
 
 	Engine(int argc, char* argv[]);
+	~Engine();
 
 	// Execute all pending commands and state changes
 	void update();
@@ -26,6 +28,7 @@ public:
 
 	void render();
 	void render_entities();
+	void delete_entities(); // Entities are dynamically allocated, so must be del
 private:
 	tcod::Console console;
 	tcod::ContextPtr context;

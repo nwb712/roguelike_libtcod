@@ -12,10 +12,13 @@ GameMap::GameMap() : width(DEF_WIDTH), height(DEF_HEIGHT) {
 	bsp_params = DEF_BSP_PARAMS;
 
 	initialize_tiles(width, height, wall_graphic);
+
 	bsp = new TCODBsp(0, 0, DEF_WIDTH, DEF_HEIGHT);
 	randomizer = new TCODRandom;
 	bsp_generate(bsp_params.depth, bsp_params.minh,
 		bsp_params.minv, bsp_params.max_h_ratio, bsp_params.max_v_ratio);
+
+	initialize_fov_map();
 }
 
 
@@ -28,14 +31,17 @@ GameMap::GameMap(int w, int h, TileGraphic wl, TileGraphic flr, BSPParams params
 	floor_graphic = flr;
 
 	initialize_tiles(w, h, wall_graphic);
+
 	bsp = new TCODBsp(0, 0, w, h);
 	randomizer = new TCODRandom;
 	bsp_params = params;
 	bsp_generate(bsp_params.depth, bsp_params.minh, 
 		bsp_params.minv, bsp_params.max_h_ratio, bsp_params.max_v_ratio);
+
+	initialize_fov_map();
 }
 GameMap::~GameMap() {
-	delete tiles; delete bsp; delete randomizer;
+	delete tiles; delete bsp; delete randomizer; delete fov_map;
 }
 
 
@@ -65,13 +71,41 @@ void GameMap::render_tiles(tcod::Console* c) {
 			t = &tiles[i + j * width];
 			TCOD_Console  con = (TCOD_Console)*c; // Retrieve a reference to TCOD_Console pointer
 			if (!t->get_data().dark) {
-				TCOD_console_put_char_ex(&con, i, j, t->get_graphic().c, t->get_graphic().color_fg, t->get_graphic().color_bg);
+				TCOD_console_put_char_ex(&con, i, j, t->get_graphic().c, 
+					t->get_graphic().color_fg, t->get_graphic().color_bg);
 			}
 			else {
-				TCOD_console_put_char_ex(&con, i, j, t->get_graphic().c, t->get_graphic().color_dark_fg, t->get_graphic().color_dark_bg);
+				TCOD_console_put_char_ex(&con, i, j, t->get_graphic().c, 
+					t->get_graphic().color_dark_fg, t->get_graphic().color_dark_bg);
 			}
 		}
 	}
+}
+
+
+
+void GameMap::initialize_fov_map() {
+	fov_map = new TCODMap(width, height);
+	for (int i = 0; i < width; i++) {
+		for (int j = 0; j < height; j++) {
+			fov_map->setProperties(i, j, get_tile(i, j)->get_data().transparent, 
+				get_tile(i, j)->get_data().passable);
+		}
+	}
+}
+
+
+
+void GameMap::compute_fov(int x, int y, int radius, bool light_walls, 
+		TCOD_fov_algorithm_t algo) {
+	fov_map->computeFov(x, y, radius, light_walls, algo);
+
+	for (int i = 0; i < width; i++) {
+		for (int j = 0; j < height; j++) {
+			get_tile(i, j)->set_dark(!is_in_fov(i, j));
+		}
+	}
+
 }
 
 
@@ -126,6 +160,7 @@ void GameMap::bsp_generate(int depth, int minh, int minv, float max_h_ratio, flo
 	bsp->splitRecursive(randomizer, depth, minh, minv, max_h_ratio, max_v_ratio);
 	bsp->traversePreOrder(call_back, NULL);
 	bsp_generate_rooms(MIN_ROOM_W, MIN_ROOM_H, MAX_ROOM_W, MAX_ROOM_H);
+
 	// Dig rooms and tunnels
 	for (int i = 0; i < rooms.size(); i++) {
 		dig_room(rooms[i]);
