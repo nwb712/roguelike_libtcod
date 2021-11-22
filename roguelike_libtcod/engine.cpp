@@ -10,10 +10,6 @@ Engine::Engine(int argc, char* argv[]) {
     console = tcod::Console{ DEF_WIDTH, DEF_HEIGHT };  // Main console.
     context = initialize_context(&console, argc, argv);
 
-    /* Generate Map */
-
-
-
     /* Place Entities */
     player->setPos(map.get_room(0).center_x(), map.get_room(0).center_y());
     entities.push_back(player);

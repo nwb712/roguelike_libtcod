@@ -183,24 +183,24 @@ void GameMap::bsp_generate_rooms(int minw, int minh, int maxw, int maxh) {
 	for (int i = 0; i < rects.size(); i++) {
 		rct = rects[i];
 		// Skip this rectangle if a room cannot fit inside
-		if (rct.w - 2 < minw || rct.h - 2 < minh) { // -2 is the offset 
+		if (rct.w < minw || rct.h < minh) { // -2 is the offset 
 			continue;
 		}
 		// Trim down max dimensions if they exceed rectangle bounds
-		if (rct.w - 2 < maxw) {
-			maxw = rct.w - 2;
+		if (rct.w < maxw) {
+			maxw = rct.w;
 		}
 		if (rct.h - 2 < maxw) {
-			maxh = rct.h - 2;
+			maxh = rct.h;
 		}
 		// Choose room dimensions
 		int width = randomizer->getInt(minw, maxw);
 		int height = randomizer->getInt(minh, maxh);
 		// Choose room position within rectangle
-		int x = rct.x + 1;
-		int y = rct.y + 1;
-		x += randomizer->getInt(0, rct.w - 2 - width);
-		y += randomizer->getInt(0, rct.h - 2 - height);
+		int x = rct.x;
+		int y = rct.y;
+		x += randomizer->getInt(0, rct.w - width);
+		y += randomizer->getInt(0, rct.h - height);
 		// Create the Rect and add it to rooms list
 		rm = Rect(x, y, width, height);
 		rooms.push_back(rm);
