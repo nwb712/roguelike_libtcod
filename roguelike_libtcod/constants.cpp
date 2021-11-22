@@ -12,10 +12,10 @@ const int MIN_ROOM_H = 5;
 const int MAX_ROOM_H = 8;
 
 const TileGraphic DEF_WALL_GRAPHIC{
-        ' ',
-        tcod::ColorRGB(255, 255, 255),
-        tcod::ColorRGB(100, 100, 100),
-        tcod::ColorRGB(125, 125, 125),
+        '#',
+        tcod::ColorRGB(0, 255, 255),
+        tcod::ColorRGB(70, 70, 70),
+        tcod::ColorRGB(0, 125, 125),
         tcod::ColorRGB(0, 0, 0),
 };
 

@@ -70,13 +70,15 @@ void GameMap::render_tiles(tcod::Console* c) {
 		for (int j = 0; j < height; j++) {
 			t = &tiles[i + j * width];
 			TCOD_Console  con = (TCOD_Console)*c; // Retrieve a reference to TCOD_Console pointer
-			if (!t->get_data().dark) {
-				TCOD_console_put_char_ex(&con, i, j, t->get_graphic().c, 
-					t->get_graphic().color_fg, t->get_graphic().color_bg);
-			}
-			else {
-				TCOD_console_put_char_ex(&con, i, j, t->get_graphic().c, 
-					t->get_graphic().color_dark_fg, t->get_graphic().color_dark_bg);
+			if (t->get_data().explored) {
+				if (!t->get_data().dark) {
+					TCOD_console_put_char_ex(&con, i, j, t->get_graphic().c,
+						t->get_graphic().color_fg, t->get_graphic().color_bg);
+				}
+				else {
+					TCOD_console_put_char_ex(&con, i, j, t->get_graphic().c,
+						t->get_graphic().color_dark_fg, t->get_graphic().color_dark_bg);
+				}
 			}
 		}
 	}
@@ -99,10 +101,18 @@ void GameMap::initialize_fov_map() {
 void GameMap::compute_fov(int x, int y, int radius, bool light_walls, 
 		TCOD_fov_algorithm_t algo) {
 	fov_map->computeFov(x, y, radius, light_walls, algo);
-
+	Tile* t;
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
-			get_tile(i, j)->set_dark(!is_in_fov(i, j));
+			t = get_tile(i, j);
+			bool in_fov = is_in_fov(i, j);
+			if (in_fov) {
+				t->set_explored(true);
+				t->set_dark(false);
+			}
+			if (!in_fov && t->get_data().explored) {
+				t->set_dark(true);
+			}
 		}
 	}
 
@@ -147,6 +157,10 @@ void GameMap::toggle_dark(int x, int y) {
 
 bool GameMap::BSPCallBack::visitNode(TCODBsp* node, void* userData) {
 	if (node->isLeaf()) {
+		/* 
+		* Rectangles are passed in with a 1 tile inset from the edge so that rooms 
+		* will always be at least two tiles apart when they are generated later.
+		*/
 		Rect rm(node->x + 1, node->y + 1, node->w - 2, node->h - 2);
 		map->rects.push_back(rm);
 	}
@@ -183,7 +197,7 @@ void GameMap::bsp_generate_rooms(int minw, int minh, int maxw, int maxh) {
 	for (int i = 0; i < rects.size(); i++) {
 		rct = rects[i];
 		// Skip this rectangle if a room cannot fit inside
-		if (rct.w < minw || rct.h < minh) { // -2 is the offset 
+		if (rct.w < minw || rct.h < minh) {
 			continue;
 		}
 		// Trim down max dimensions if they exceed rectangle bounds

@@ -16,6 +16,7 @@ struct TileData {
 	bool passable = false;
 	bool transparent = false;
 	bool dark = true;
+	bool explored = false;
 };
 
 class Tile {
@@ -42,6 +43,10 @@ public:
 	bool is_dark() { return data.dark; };
 	void set_dark(bool dark) { data.dark = dark; }
 	void toggle_dark() { data.dark = !data.dark; };
+
+	bool is_explored() { return data.explored; }
+	void set_explored(bool expl) { data.explored = expl; }
+	void toggle_explored() { data.explored = !data.explored; }
 private:
 	TileGraphic graphic;
 	TileData data;
