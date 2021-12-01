@@ -9,11 +9,11 @@
 
 // Holds all of the parameters needed to initialize the GameMap
 struct BSPParams {
-	int depth = 3;
-	int minh = 4;
-	int minv = 4;
-	float max_h_ratio = 0.75;
-	float max_v_ratio = 0.75;
+	int depth;// = 3;
+	int minh;// = 4;
+	int minv;// = 4;
+	float max_h_ratio;// = 0.75;
+	float max_v_ratio;// = 0.75;
 };
 
 // A rectangle struct to hold room information
@@ -94,6 +94,7 @@ public:
 	void bsp_generate_rooms(int minw, int minh, int maxw, int maxh);
 
 	Rect get_room(int index);
+	int get_num_rooms();
 
 	/*
 	 * Retrieve a reference to the tile at the specified location, then set the

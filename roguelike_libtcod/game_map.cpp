@@ -232,6 +232,12 @@ Rect GameMap::get_room(int index) {
 
 
 
+
+int GameMap::get_num_rooms() {
+	return rooms.size();
+}
+
+
 void GameMap::dig(int x, int y) {
 	Tile* t = GameMap::get_tile(x, y);
 	t->set_transparent(true);

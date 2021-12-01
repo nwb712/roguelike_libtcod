@@ -11,6 +11,8 @@ const int MAX_ROOM_W = 8;
 const int MIN_ROOM_H = 5;
 const int MAX_ROOM_H = 8;
 
+const int MAX_ROOM_POP = 3;
+
 const TileGraphic DEF_WALL_GRAPHIC{
         '#',
         tcod::ColorRGB(0, 255, 255),

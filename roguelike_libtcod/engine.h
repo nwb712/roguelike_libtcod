@@ -9,7 +9,6 @@
 #include "entity.h"
 #include "game_map.h"
 #include "input_handler.h"
-#include "tile.h"
 
 
 
@@ -25,6 +24,13 @@ public:
 	void update();
 	// Execute the player command retrieved from the input handler
 	void execute_player_command(Command* command);
+
+	// Return a ptr to the Entity at x, y. Returns nullptr if none exists
+	Entity* check_entity_collision(int x, int y);
+	// Place an enemy at the specified location
+	void add_enemy(int x, int y);
+	// Place enemies in all rooms on the game map
+	void populate_enemies(int max_pop);
 
 	void render();
 	void render_entities();

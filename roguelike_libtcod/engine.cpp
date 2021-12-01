@@ -14,9 +14,12 @@ Engine::Engine(int argc, char* argv[]) {
     player->setPos(map.get_room(0).center_x(), map.get_room(0).center_y());
     entities.push_back(player);
 
+    populate_enemies(MAX_ROOM_POP);
+    /*
     Entity* goblin = new Entity(map.get_room(1).center_x(), 
         map.get_room(1).center_y(), 'G', tcod::ColorRGB(TCOD_green), "Goblin");
     entities.push_back(goblin);
+    */
 }
 
 
@@ -28,13 +31,16 @@ Engine::~Engine() {
 
 
 void Engine::update() {
+    // Handle player input
     Command* command = input.handle_input();
     execute_player_command(command);
+    // If the command was quit request, set quit flag in engine
     if (command) {
         if (command->get_type() == CommandType::quit_command) {
             quit = true;
         }
     }
+
 }
 
 
@@ -45,8 +51,12 @@ void Engine::execute_player_command(Command* command) {
             quit = true;
         }
         if (command->get_type() == CommandType::move_command) {
+            Entity* e = check_entity_collision(command->getDx() + player->getX(), command->getDy() + player->getY());
             recompute_fov = true; // Need to recompute map fov after player move
-            if (map.is_passable(player->getX() + command->getDx(), player->getY() + command->getDy())) {
+            if (e) {
+                std::cout << "You verbally assault the " << e->getName() << std::endl;
+            }
+            else if (map.is_passable(player->getX() + command->getDx(), player->getY() + command->getDy())) {
                 command->execute(*player);
             }
             else {
@@ -55,6 +65,50 @@ void Engine::execute_player_command(Command* command) {
             }
         }
     }
+}   
+
+
+
+Entity* Engine::check_entity_collision(int x, int y) {
+    for (int i = 0; i < entities.size(); i++) {
+        if (entities[i]->getX() == x && entities[i]->getY() == y) {
+            return entities[i];
+        }
+    }
+    return nullptr;
+}
+
+
+
+void Engine::add_enemy(int x, int y) {
+    // In the future a random stat block and enemy type will be picked here
+    Entity* e = new Entity(x, y, 'G', tcod::ColorRGB(TCOD_green), "Goblin");
+    entities.push_back(e);
+}
+
+
+
+void Engine::populate_enemies(int max_pop) {
+    TCODRandom* r = new TCODRandom; // May want to pass in r from map later
+    Entity* e;
+    int num_enemies;
+    Rect room;
+    int xpos;
+    int ypos;
+    for (int i = 0; i < map.get_num_rooms(); i++) {
+        num_enemies = r->getInt(1, max_pop);
+        room = map.get_room(i);
+        while (num_enemies > 0) {
+            xpos = r->getInt(room.x, room.x + room.w - 1);
+            ypos = r->getInt(room.y, room.y + room.h - 1);
+            e = check_entity_collision(xpos, ypos);
+            if (!e) {
+                add_enemy(xpos, ypos);
+                num_enemies--;
+            }
+        }
+    }
+    delete r; // Dynamically allocated randomizer needs to be deleted
 }
 
 

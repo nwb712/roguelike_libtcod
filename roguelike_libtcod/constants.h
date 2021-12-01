@@ -12,6 +12,8 @@ extern const int MAX_ROOM_W;
 extern const int MIN_ROOM_H;
 extern const int MAX_ROOM_H;
 
+extern const int MAX_ROOM_POP;
+
 extern const TileGraphic DEF_WALL_GRAPHIC;
 extern const TileGraphic DEF_FLOOR_GRAPHIC;
 
