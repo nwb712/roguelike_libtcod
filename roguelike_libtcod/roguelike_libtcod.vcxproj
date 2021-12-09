@@ -156,6 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="command.cpp" />
+    <ClCompile Include="componet_ai_player.cpp" />
     <ClCompile Include="constants.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="entity.cpp" />
@@ -165,6 +166,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="command.h" />
+    <ClInclude Include="componet.h" />
+    <ClInclude Include="componet_ai.h" />
+    <ClInclude Include="componet_combatant.h" />
+    <ClInclude Include="componet_destructable.h" />
     <ClInclude Include="constants.h" />
     <ClInclude Include="engine.h" />
     <ClInclude Include="entity.h" />

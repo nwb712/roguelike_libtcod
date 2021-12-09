@@ -12,6 +12,16 @@
 
 
 
+enum GameState {
+	STARTUP,
+	IDLE,
+	NEW_TURN,
+	VICTORY,
+	DEFEAT
+};
+
+
+
 class Engine {
 public:
 	bool quit = false;
@@ -27,15 +37,20 @@ public:
 
 	// Return a ptr to the Entity at x, y. Returns nullptr if none exists
 	Entity* check_entity_collision(int x, int y);
+
 	// Place an enemy at the specified location
 	void add_enemy(int x, int y);
 	// Place enemies in all rooms on the game map
 	void populate_enemies(int max_pop);
+	void update_enemies();
+
 
 	void render();
 	void render_entities();
 	void delete_entities(); // Entities are dynamically allocated, so must be del
 private:
+	GameState game_state = STARTUP;
+
 	tcod::Console console;
 	tcod::ContextPtr context;
 

@@ -15,11 +15,7 @@ Engine::Engine(int argc, char* argv[]) {
     entities.push_back(player);
 
     populate_enemies(MAX_ROOM_POP);
-    /*
-    Entity* goblin = new Entity(map.get_room(1).center_x(), 
-        map.get_room(1).center_y(), 'G', tcod::ColorRGB(TCOD_green), "Goblin");
-    entities.push_back(goblin);
-    */
+    
 }
 
 
@@ -31,16 +27,34 @@ Engine::~Engine() {
 
 
 void Engine::update() {
-    // Handle player input
-    Command* command = input.handle_input();
-    execute_player_command(command);
-    // If the command was quit request, set quit flag in engine
-    if (command) {
-        if (command->get_type() == CommandType::quit_command) {
-            quit = true;
-        }
+    Command* command;
+    // If necessary, recompute FOV
+    if (recompute_fov) {
+        map.compute_fov(player->getX(), player->getY());
+        recompute_fov = false;
     }
-
+    switch (game_state) {
+    case STARTUP:
+        game_state = IDLE;
+        break;
+    case IDLE:
+        command = input.handle_input();
+        execute_player_command(command);
+        game_state = NEW_TURN;
+        break;
+    case NEW_TURN:
+        update_enemies();
+        game_state = IDLE;
+        break;
+    case VICTORY:
+        std::cout << "You win \n";
+        quit = true;
+        break;
+    case DEFEAT:
+        std::cout << "You lose \n";
+        quit = true;
+        break;
+    }
 }
 
 
@@ -113,6 +127,12 @@ void Engine::populate_enemies(int max_pop) {
 
 
 
+void Engine::update_enemies() {
+    ;
+}
+
+
+
 tcod::ContextPtr Engine::initialize_context(tcod::Console* console, int argc, char* argv[]) {
     // Configure the context.
     auto params = TCOD_ContextParams{};
@@ -134,10 +154,6 @@ tcod::ContextPtr Engine::initialize_context(tcod::Console* console, int argc, ch
 
 void Engine::render() {
     TCOD_console_clear(console.get());
-    if (recompute_fov) {
-        map.compute_fov(player->getX(), player->getY());
-        recompute_fov = false;
-    }
     map.render_tiles(&console);
     render_entities();
     context->present(console);  // Updates the visible display.

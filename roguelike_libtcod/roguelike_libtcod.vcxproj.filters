@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="componets">
+      <UniqueIdentifier>{ab1d2101-6306-4d7a-87ca-07007c56a2ea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -36,6 +39,9 @@
     <ClCompile Include="engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="componet_ai_player.cpp">
+      <Filter>componets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="entity.h">
@@ -58,6 +64,18 @@
     </ClInclude>
     <ClInclude Include="engine.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="componet.h">
+      <Filter>componets</Filter>
+    </ClInclude>
+    <ClInclude Include="componet_ai.h">
+      <Filter>componets</Filter>
+    </ClInclude>
+    <ClInclude Include="componet_destructable.h">
+      <Filter>componets</Filter>
+    </ClInclude>
+    <ClInclude Include="componet_combatant.h">
+      <Filter>componets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
