@@ -160,6 +160,7 @@
     <ClCompile Include="constants.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="entity.cpp" />
+    <ClCompile Include="entity_list.cpp" />
     <ClCompile Include="game_map.cpp" />
     <ClCompile Include="input_handler.cpp" />
     <ClCompile Include="main.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="constants.h" />
     <ClInclude Include="engine.h" />
     <ClInclude Include="entity.h" />
+    <ClInclude Include="entity_list.h" />
     <ClInclude Include="game_map.h" />
     <ClInclude Include="input_handler.h" />
     <ClInclude Include="tile.h" />

@@ -1,49 +1,59 @@
 #include <iostream>
 #include <libtcod.h>
 #include <SDL.h>
+#include "command.h"
 #include "constants.h"
 #include "engine.h"
 #include "entity.h"
+#include "entity_list.h"
+#include "game_map.h"
+
 
 Engine::Engine(int argc, char* argv[]) {
-    /* Initialize Console and Context */
+
     console = tcod::Console{ DEF_WIDTH, DEF_HEIGHT };  // Main console.
     context = initialize_context(&console, argc, argv);
 
-    /* Place Entities */
-    player->setPos(map.get_room(0).center_x(), map.get_room(0).center_y());
-    entities.push_back(player);
+    map = new GameMap(DEF_WIDTH, DEF_HEIGHT, DEF_WALL_GRAPHIC, DEF_FLOOR_GRAPHIC, DEF_BSP_PARAMS);
+
+    entities = new EntityList(map, player);
+
+    // Set player position and spawn enemies
+    player = new Entity(map->get_room(0).center_x(), map->get_room(0).center_y(),
+        '@', tcod::ColorRGB(TCOD_white), "The Great Borealis");
+    player->ai = new ComponetAiPlayer(player);
+    entities->add_entity(player);
 
     populate_enemies(MAX_ROOM_POP);
-    
 }
 
 
 
 Engine::~Engine() {
-    delete_entities();
+    // Delete any dynamically allocated resources here
+    entities->clear_entities();
+    delete entities;
+
+    delete map;
 }
 
 
 
 void Engine::update() {
     Command* command;
-    // If necessary, recompute FOV
-    if (recompute_fov) {
-        map.compute_fov(player->getX(), player->getY());
-        recompute_fov = false;
+    if (map->recompute_fov) {
+        map->compute_fov(player->getX(), player->getY());
     }
     switch (game_state) {
     case STARTUP:
         game_state = IDLE;
         break;
     case IDLE:
-        command = input.handle_input();
-        execute_player_command(command);
+        player->update(map, entities->entities);
         game_state = NEW_TURN;
         break;
     case NEW_TURN:
-        update_enemies();
+        entities->update();
         game_state = IDLE;
         break;
     case VICTORY:
@@ -59,63 +69,31 @@ void Engine::update() {
 
 
 
-void Engine::execute_player_command(Command* command) {
-    if (command) {
-        if (command->get_type() == CommandType::quit_command) {
-            quit = true;
-        }
-        if (command->get_type() == CommandType::move_command) {
-            Entity* e = check_entity_collision(command->getDx() + player->getX(), command->getDy() + player->getY());
-            recompute_fov = true; // Need to recompute map fov after player move
-            if (e) {
-                std::cout << "You verbally assault the " << e->getName() << std::endl;
-            }
-            else if (map.is_passable(player->getX() + command->getDx(), player->getY() + command->getDy())) {
-                command->execute(*player);
-            }
-            else {
-                // May be a good idea to create a message class
-                std::cout << "You walk into a wall.\n";
-            }
-        }
-    }
-}   
-
-
-
-Entity* Engine::check_entity_collision(int x, int y) {
-    for (int i = 0; i < entities.size(); i++) {
-        if (entities[i]->getX() == x && entities[i]->getY() == y) {
-            return entities[i];
-        }
-    }
-    return nullptr;
-}
-
-
-
 void Engine::add_enemy(int x, int y) {
     // In the future a random stat block and enemy type will be picked here
     Entity* e = new Entity(x, y, 'G', tcod::ColorRGB(TCOD_green), "Goblin");
-    entities.push_back(e);
+    entities->add_entity(e);
 }
 
 
 
 void Engine::populate_enemies(int max_pop) {
-    TCODRandom* r = new TCODRandom; // May want to pass in r from map later
+    TCODRandom* r = new TCODRandom;
     Entity* e;
-    int num_enemies;
+
     Rect room;
+    int num_enemies;
+
     int xpos;
     int ypos;
-    for (int i = 0; i < map.get_num_rooms(); i++) {
+
+    for (int i = 0; i < map->get_num_rooms(); i++) {
         num_enemies = r->getInt(1, max_pop);
-        room = map.get_room(i);
+        room = map->get_room(i);
         while (num_enemies > 0) {
             xpos = r->getInt(room.x, room.x + room.w - 1);
             ypos = r->getInt(room.y, room.y + room.h - 1);
-            e = check_entity_collision(xpos, ypos);
+            e = entities->check_collision_at(xpos, ypos);
             if (!e) {
                 add_enemy(xpos, ypos);
                 num_enemies--;
@@ -123,12 +101,6 @@ void Engine::populate_enemies(int max_pop) {
         }
     }
     delete r; // Dynamically allocated randomizer needs to be deleted
-}
-
-
-
-void Engine::update_enemies() {
-    ;
 }
 
 
@@ -154,29 +126,7 @@ tcod::ContextPtr Engine::initialize_context(tcod::Console* console, int argc, ch
 
 void Engine::render() {
     TCOD_console_clear(console.get());
-    map.render_tiles(&console);
-    render_entities();
+    map->render_tiles(&console);
+    entities->render(&console);
     context->present(console);  // Updates the visible display.
-}
-
-
-
-void Engine::render_entities() {
-    Entity* e;
-    for (int i = 0; i < entities.size(); i++) {
-        e = entities[i];
-        if (map.is_in_fov(e->getX(), e->getY())){
-            tcod::print(console, { e->getX(), e->getY() }, 
-                std::string(1, e->getChar()), e->getColor(), std::nullopt);
-        }
-    }
-};
-
-
-
-void Engine::delete_entities() {
-    for (int i = 0; i < entities.size(); i++) {
-        delete entities[i];
-    }
-    entities.clear();
 }

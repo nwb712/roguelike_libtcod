@@ -42,6 +42,9 @@
     <ClCompile Include="componet_ai_player.cpp">
       <Filter>componets</Filter>
     </ClCompile>
+    <ClCompile Include="entity_list.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="entity.h">
@@ -76,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="componet_combatant.h">
       <Filter>componets</Filter>
+    </ClInclude>
+    <ClInclude Include="entity_list.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

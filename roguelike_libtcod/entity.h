@@ -2,7 +2,6 @@
 #define ENTITY_H_11_14_21
 
 #include <libtcod.h>
-#include "command.h"
 #include "componet.h"
 #include "game_map.h"
 
@@ -11,6 +10,7 @@ class Entity {
 public:
 	/*		Constructors + Destructor		*/	
 
+	~Entity();
 	Entity();
 	Entity(int x, int y, char c, tcod::ColorRGB clr, std::string n, bool blcks = true);
 
@@ -22,16 +22,19 @@ public:
 
 	/*			Standard methods			*/
 
-	Entity* check_collision(GameMap* map);
-	void execute_command(Command* command, GameMap* map);
-	void update(GameMap* map, std::vector<Entity*>& entities);
+	Entity* check_collision(int x, int y, GameMap* map, std::vector<Entity*> entities);
+	void execute_command(Command* command, GameMap* map, std::vector<Entity*> entities);
+	void update(GameMap* map, std::vector<Entity*> entities);
 	void move(int dx, int dy);
 	void wait();
 
-	/*				GetSet					*/
+	/*				Accessors				*/
 
 	std::string getName();
 	void setName(std::string n);
+
+	bool get_blocks() { return blocks; }
+	void set_blocks(bool b) { blocks = b; }
 
 	int getX();
 	int getY();

@@ -2,7 +2,8 @@
 #define COMMAND_H_11_14_21
 
 #include <iostream>
-#include "entity.h"
+
+class Entity;
 
 enum class CommandType {
 	command,

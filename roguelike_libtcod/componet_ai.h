@@ -5,27 +5,39 @@
 #include "command.h"
 #include "game_map.h"
 
+class Entity;
 
 class ComponetAi {
 public:
-	virtual void update(GameMap* map) = 0;
-	Command* get_command() { return command; }
+	virtual Command* update(GameMap* map, std::vector<Entity*> entities) = 0;
+	Entity* check_collision(int x, int y, GameMap* map, std::vector<Entity*> entities);
 private:
-	Command* command = nullptr;
+	Entity* self;
 };
 
 
 // This ai componet detirmines a command to be executed based on player input
 class ComponetAiPlayer : public ComponetAi {
 public:
-	void update(GameMap* map);
+	ComponetAiPlayer(Entity* s) {}
+	Command* update(GameMap* map, std::vector<Entity*> entities);
 private:
-	void handle_input();
 
-	Command* command = nullptr;
-	SDL_Event event;
+	Entity* self;
+	
 	MoveCommand move;
 	WaitCommand wait;
 	QuitCommand quit;
+
+	SDL_Event event;
+	Command* handle_input();
+};
+
+
+
+class ComponetAiEnemy : public ComponetAi {
+public:
+	Command* update(GameMap* map) { return new WaitCommand(); };
+private:
 };
 #endif

@@ -7,14 +7,13 @@
 
 
 
-// Holds all of the parameters needed to initialize the GameMap
 struct BSPParams {
 	int depth;// = 3;
 	int minh;// = 4;
 	int minv;// = 4;
 	float max_h_ratio;// = 0.75;
 	float max_v_ratio;// = 0.75;
-};
+}; 
 
 // A rectangle struct to hold room information
 struct Rect {
@@ -38,7 +37,7 @@ class GameMap {
 public:
 	// The default constructor pulls data from constants.h to initialize vars
 	GameMap();
-	GameMap(int w, int h, TileGraphic wl, TileGraphic flr, BSPParams bsp_params);
+	GameMap(int w, int h, TileGraphic wl, TileGraphic flr, BSPParams params);
 	~GameMap();
 
 	void initialize_tiles(int width, int height, TileGraphic t);
@@ -57,6 +56,7 @@ public:
 	void compute_fov(int x, int y, int radius = 6, bool light_walls = true, TCOD_fov_algorithm_t algo = FOV_BASIC);
 	// Return whether a cell at a given x, y location is within fov
 	bool is_in_fov(int x, int y) { return fov_map->isInFov(x, y); }
+	bool recompute_fov = true;
 
 	// Returns true if the given coordinate is within the bounds of the tile map
 	bool in_bounds(int x, int y);

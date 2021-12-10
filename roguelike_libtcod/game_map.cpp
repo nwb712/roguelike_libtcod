@@ -1,6 +1,7 @@
 #include <iostream>
 #include <libtcod.h>
 #include "constants.h"
+#include "entity.h"
 #include "game_map.h"
 #include "tile.h"
 
@@ -37,6 +38,7 @@ GameMap::GameMap(int w, int h, TileGraphic wl, TileGraphic flr, BSPParams params
 	bsp_params = params;
 	bsp_generate(bsp_params.depth, bsp_params.minh, 
 		bsp_params.minv, bsp_params.max_h_ratio, bsp_params.max_v_ratio);
+
 
 	initialize_fov_map();
 }
@@ -115,7 +117,7 @@ void GameMap::compute_fov(int x, int y, int radius, bool light_walls,
 			}
 		}
 	}
-
+	recompute_fov = false;
 }
 
 
