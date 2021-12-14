@@ -18,7 +18,7 @@ Entity* ComponetAi::check_collision(int x, int y, GameMap* map, std::vector<Enti
 
 Command* ComponetAiPlayer::update(GameMap* map, std::vector<Entity*> entities) {
     Command* command = handle_input();
-    /*
+    /* Trying to move collision logic into ai componet. It is not going well...
     if ((command) && command->get_type() == CommandType::move_command) {
         Entity* other = check_collision(self->getX() + command->getDx(), 
             self->getY() + command->getDy(), map, entities);

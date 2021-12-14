@@ -3,9 +3,9 @@
 
 #include <iostream>
 #include <libtcod.h>
-#include "entity.h"
 #include "game_map.h"
 
+class Entity;
 
 /*
 * A container class to hold and manage the list of entities.
